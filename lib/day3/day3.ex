@@ -19,13 +19,8 @@ defmodule AdventOfCode2018.Day3 do
   def do_overlapped_square_inches(parsed_input) do
     parsed_input
     |> expand_claims()
-    |> Enum.reduce(0, fn {_pos, claim_count}, total_overlapped_square_inches ->
-      if claim_count > 1 do
-        total_overlapped_square_inches + 1
-      else
-        total_overlapped_square_inches
-      end
-    end)
+    |> Enum.filter(fn {_pos, claim_count} -> claim_count > 1 end)
+    |> Enum.count()
   end
 
   def expand_claims(claims) do
@@ -59,21 +54,13 @@ defmodule AdventOfCode2018.Day3 do
   end
 
   def is_claim_intact?({id, left, top, width, height}, expanded_claims) do
-    Enum.reduce_while((left + 1)..(left + width), {id, true}, fn x, _claim_intact ->
-      Enum.reduce_while((top + 1)..(top + height), {id, true}, fn y, _claim_intact ->
-        if Map.fetch!(expanded_claims, {x, y}) == 1 do
-          {:cont, {id, true}}
-        else
-          {:halt, {id, false}}
-        end
+    claim_intact =
+      Enum.all?((left + 1)..(left + width), fn x ->
+        Enum.all?((top + 1)..(top + height), fn y ->
+          Map.fetch!(expanded_claims, {x, y}) == 1
+        end)
       end)
-      |> case do
-        {id, true} ->
-          {:cont, {id, true}}
 
-          {id, false} ->
-          {:halt, {id, false}}
-      end
-    end)
+    {id, claim_intact}
   end
 end
