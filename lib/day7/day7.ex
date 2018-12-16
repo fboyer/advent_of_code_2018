@@ -7,11 +7,7 @@ defmodule AdventOfCode2018.Day7 do
 
   def parse_input(input) do
     input
-    |> String.split("\n", trim: true)
-    |> Enum.map(
-      &String.split(&1, ["Step ", " must be finished before step ", " can begin."], trim: true)
-    )
-    |> List.flatten()
+    |> String.split(["Step ", " must be finished before step ", " can begin.", "\n"], trim: true)
     |> build_requirements(%{})
   end
 
